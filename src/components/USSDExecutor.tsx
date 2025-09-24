@@ -65,44 +65,69 @@ export const USSDExecutor = () => {
     const responses: Record<string, USSDResponse> = {
       "*123#": {
         sessionId,
-        message: `Welcome to ${operator}\n\nYour balance: R45.50\nExpiry: 30 days\n\n1. Buy airtime\n2. Buy data\n3. Transfer airtime\n4. My account\n0. Exit`,
+        message: `Welcome to ${operator}\n\nAccount Activation Menu\n\n1. New line activation\n2. SIM card activation\n3. Service activation\n4. Check activation status\n0. Exit`,
         isMenu: true,
         options: [
-          { key: "1", text: "Buy airtime" },
-          { key: "2", text: "Buy data" },
-          { key: "3", text: "Transfer airtime" },
-          { key: "4", text: "My account" },
+          { key: "1", text: "New line activation" },
+          { key: "2", text: "SIM card activation" },
+          { key: "3", text: "Service activation" },
+          { key: "4", text: "Check activation status" },
           { key: "0", text: "Exit" }
         ]
       },
       "*131#": {
         sessionId,
-        message: `${operator} Data Services\n\nData balance: 2.5GB\nExpiry: 15 days\n\n1. Buy data bundle\n2. Data usage history\n3. Share data\n4. Data settings\n0. Exit`,
+        message: `${operator} Data Topup\n\nSelect data package:\n\n1. 1GB - 10 MAD\n2. 5GB - 40 MAD\n3. 10GB - 70 MAD\n4. Unlimited - 100 MAD\n0. Exit`,
         isMenu: true,
         options: [
-          { key: "1", text: "Buy data bundle" },
-          { key: "2", text: "Data usage history" },
-          { key: "3", text: "Share data" },
-          { key: "4", text: "Data settings" },
+          { key: "1", text: "1GB - 10 MAD" },
+          { key: "2", text: "5GB - 40 MAD" },
+          { key: "3", text: "10GB - 70 MAD" },
+          { key: "4", text: "Unlimited - 100 MAD" },
           { key: "0", text: "Exit" }
         ]
       },
       "*100#": {
         sessionId,
-        message: `${operator} Airtime Top-up\n\n1. Buy for myself\n2. Buy for someone else\n3. Airtime voucher\n4. Check recent purchases\n0. Main menu`,
+        message: `${operator} Airtime Topup\n\n1. 10 MAD\n2. 20 MAD\n3. 50 MAD\n4. 100 MAD\n5. 200 MAD\n0. Main menu`,
         isMenu: true,
         options: [
-          { key: "1", text: "Buy for myself" },
-          { key: "2", text: "Buy for someone else" },
-          { key: "3", text: "Airtime voucher" },
-          { key: "4", text: "Check recent purchases" },
+          { key: "1", text: "10 MAD" },
+          { key: "2", text: "20 MAD" },
+          { key: "3", text: "50 MAD" },
+          { key: "4", text: "100 MAD" },
+          { key: "5", text: "200 MAD" },
           { key: "0", text: "Main menu" }
         ]
       },
+      "*222#": {
+        sessionId,
+        message: `${operator} Bundle Topup\n\n1. Voice bundle\n2. SMS bundle\n3. Data bundle\n4. Mixed bundle\n0. Exit`,
+        isMenu: true,
+        options: [
+          { key: "1", text: "Voice bundle" },
+          { key: "2", text: "SMS bundle" },
+          { key: "3", text: "Data bundle" },
+          { key: "4", text: "Mixed bundle" },
+          { key: "0", text: "Exit" }
+        ]
+      },
+      "*321#": {
+        sessionId,
+        message: `${operator} Line Activation\n\nYour line activation is in progress.\n\nActivation will be completed within 24 hours.\n\nThank you for choosing ${operator}.`,
+        isMenu: false
+      },
       "*555#": {
         sessionId,
-        message: "Please Call Me service activated successfully!\n\nYour request has been sent.",
-        isMenu: false
+        message: `${operator} Service Activation\n\n1. International roaming\n2. Call forwarding\n3. Voicemail\n4. SMS notifications\n0. Exit`,
+        isMenu: true,
+        options: [
+          { key: "1", text: "International roaming" },
+          { key: "2", text: "Call forwarding" },
+          { key: "3", text: "Voicemail" },
+          { key: "4", text: "SMS notifications" },
+          { key: "0", text: "Exit" }
+        ]
       }
     };
 

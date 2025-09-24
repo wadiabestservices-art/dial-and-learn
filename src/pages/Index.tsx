@@ -27,7 +27,7 @@ const Index = () => {
     {
       id: "1",
       ussdCode: "*123#",
-      description: "Check Account Balance",
+      description: "Account Activation",
       deviceName: "Samsung Galaxy A54",
       simCard: "Slot 1",
       operator: "Inwi",
@@ -38,7 +38,7 @@ const Index = () => {
     {
       id: "2",
       ussdCode: "*131#",
-      description: "Check Data Balance", 
+      description: "Data Topup", 
       deviceName: "iPhone 14",
       simCard: "eSIM 1",
       operator: "IAM",
@@ -48,7 +48,7 @@ const Index = () => {
     {
       id: "3",
       ussdCode: "*100#",
-      description: "Airtime Top-up Menu",
+      description: "Airtime Topup",
       deviceName: "Xiaomi Redmi Note 12",
       simCard: "Slot 2", 
       operator: "Orange",
@@ -58,13 +58,34 @@ const Index = () => {
     {
       id: "4",
       ussdCode: "*555#",
-      description: "Please Call Me Service",
+      description: "Service Activation",
       deviceName: "Samsung Galaxy A54",
       simCard: "Slot 1",
       operator: "Inwi",
       status: "pending",
       queuedAt: new Date(Date.now() - 1000 * 60 * 1),
       estimatedTime: "45 seconds"
+    },
+    {
+      id: "5",
+      ussdCode: "*222#",
+      description: "Bundle Topup",
+      deviceName: "iPhone 14",
+      simCard: "Physical SIM",
+      operator: "Orange",
+      status: "pending",
+      queuedAt: new Date(Date.now() - 1000 * 60 * 3),
+      estimatedTime: "60 seconds"
+    },
+    {
+      id: "6",
+      ussdCode: "*321#",
+      description: "Line Activation",
+      deviceName: "Xiaomi Redmi Note 12",
+      simCard: "Slot 1", 
+      operator: "IAM",
+      status: "failed",
+      queuedAt: new Date(Date.now() - 1000 * 60 * 8)
     }
   ]);
 
