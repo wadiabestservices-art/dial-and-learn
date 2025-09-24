@@ -4,8 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, Smartphone, Clock, CreditCard, RefreshCw, CheckCircle } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Search, Smartphone, Clock, CreditCard, RefreshCw, CheckCircle, Play } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { USSDExecutor } from "@/components/USSDExecutor";
 
 interface PendingOperation {
   id: string;
@@ -105,77 +107,99 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Search */}
+      {/* Main Content */}
       <div className="container mx-auto px-4 py-6">
-        <div className="mb-6">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search operations..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-        </div>
+        <Tabs defaultValue="execute" className="space-y-6">
+          <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsTrigger value="execute" className="flex items-center gap-2">
+              <Play className="h-4 w-4" />
+              Execute USSD
+            </TabsTrigger>
+            <TabsTrigger value="operations" className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Operations
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Pending Operations Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5" />
-              Pending Operations ({filteredOperations.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>USSD Code</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Device</TableHead>
-                    <TableHead>SIM Card</TableHead>
-                    <TableHead>Operator</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Queued</TableHead>
-                    <TableHead>ETA</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredOperations.map((operation) => (
-                    <TableRow key={operation.id}>
-                      <TableCell>
-                        <code className="font-mono text-sm bg-muted px-2 py-1 rounded">
-                          {operation.ussdCode}
-                        </code>
-                      </TableCell>
-                      <TableCell className="font-medium">{operation.description}</TableCell>
-                      <TableCell className="flex items-center gap-2">
-                        <Smartphone className="h-4 w-4 text-muted-foreground" />
-                        {operation.deviceName}
-                      </TableCell>
-                      <TableCell className="flex items-center gap-2">
-                        <CreditCard className="h-4 w-4 text-muted-foreground" />
-                        {operation.simCard}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{operation.operator}</Badge>
-                      </TableCell>
-                      <TableCell>{getStatusBadge(operation.status)}</TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {operation.queuedAt.toLocaleTimeString()}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {operation.estimatedTime || '-'}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+          {/* Execute USSD Tab */}
+          <TabsContent value="execute">
+            <USSDExecutor />
+          </TabsContent>
+
+          {/* Operations Tab */}
+          <TabsContent value="operations" className="space-y-6">
+            {/* Search */}
+            <div className="mb-6">
+              <div className="relative max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search operations..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
             </div>
-          </CardContent>
-        </Card>
+
+            {/* Pending Operations Table */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="h-5 w-5" />
+                  Pending Operations ({filteredOperations.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>USSD Code</TableHead>
+                        <TableHead>Description</TableHead>
+                        <TableHead>Device</TableHead>
+                        <TableHead>SIM Card</TableHead>
+                        <TableHead>Operator</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Queued</TableHead>
+                        <TableHead>ETA</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredOperations.map((operation) => (
+                        <TableRow key={operation.id}>
+                          <TableCell>
+                            <code className="font-mono text-sm bg-muted px-2 py-1 rounded">
+                              {operation.ussdCode}
+                            </code>
+                          </TableCell>
+                          <TableCell className="font-medium">{operation.description}</TableCell>
+                          <TableCell className="flex items-center gap-2">
+                            <Smartphone className="h-4 w-4 text-muted-foreground" />
+                            {operation.deviceName}
+                          </TableCell>
+                          <TableCell className="flex items-center gap-2">
+                            <CreditCard className="h-4 w-4 text-muted-foreground" />
+                            {operation.simCard}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{operation.operator}</Badge>
+                          </TableCell>
+                          <TableCell>{getStatusBadge(operation.status)}</TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {operation.queuedAt.toLocaleTimeString()}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {operation.estimatedTime || '-'}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
