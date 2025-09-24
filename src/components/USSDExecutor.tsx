@@ -36,24 +36,24 @@ export const USSDExecutor = () => {
       id: "1",
       name: "Samsung Galaxy A54", 
       simCards: [
-        { slot: "Slot 1", operator: "MTN" },
-        { slot: "Slot 2", operator: "Vodacom" }
+        { slot: "Slot 1", operator: "Inwi" },
+        { slot: "Slot 2", operator: "Orange" }
       ]
     },
     {
       id: "2", 
       name: "iPhone 14",
       simCards: [
-        { slot: "eSIM 1", operator: "Vodacom" },
-        { slot: "Physical SIM", operator: "Cell C" }
+        { slot: "eSIM 1", operator: "IAM" },
+        { slot: "Physical SIM", operator: "Orange" }
       ]
     },
     {
       id: "3",
       name: "Xiaomi Redmi Note 12",
       simCards: [
-        { slot: "Slot 1", operator: "Cell C" },
-        { slot: "Slot 2", operator: "Telkom" }
+        { slot: "Slot 1", operator: "Inwi" },
+        { slot: "Slot 2", operator: "IAM" }
       ]
     }
   ];

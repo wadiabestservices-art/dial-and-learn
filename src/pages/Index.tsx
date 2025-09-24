@@ -30,7 +30,7 @@ const Index = () => {
       description: "Check Account Balance",
       deviceName: "Samsung Galaxy A54",
       simCard: "Slot 1",
-      operator: "MTN",
+      operator: "Inwi",
       status: "pending",
       queuedAt: new Date(Date.now() - 1000 * 60 * 5),
       estimatedTime: "30 seconds"
@@ -41,7 +41,7 @@ const Index = () => {
       description: "Check Data Balance", 
       deviceName: "iPhone 14",
       simCard: "eSIM 1",
-      operator: "Vodacom",
+      operator: "IAM",
       status: "executing",
       queuedAt: new Date(Date.now() - 1000 * 60 * 2)
     },
@@ -51,7 +51,7 @@ const Index = () => {
       description: "Airtime Top-up Menu",
       deviceName: "Xiaomi Redmi Note 12",
       simCard: "Slot 2", 
-      operator: "Cell C",
+      operator: "Orange",
       status: "completed",
       queuedAt: new Date(Date.now() - 1000 * 60 * 10)
     },
@@ -61,7 +61,7 @@ const Index = () => {
       description: "Please Call Me Service",
       deviceName: "Samsung Galaxy A54",
       simCard: "Slot 1",
-      operator: "MTN",
+      operator: "Inwi",
       status: "pending",
       queuedAt: new Date(Date.now() - 1000 * 60 * 1),
       estimatedTime: "45 seconds"
