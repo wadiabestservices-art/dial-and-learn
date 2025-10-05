@@ -1,10 +1,9 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Phone, Smartphone, CreditCard, Loader2 } from "lucide-react";
+import { Smartphone, CreditCard, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { USSDMenu } from "./USSDMenu";
 
@@ -28,7 +27,15 @@ export const USSDExecutor = () => {
   const [selectedSim, setSelectedSim] = useState<string>("");
   const [isExecuting, setIsExecuting] = useState(false);
   const [currentResponse, setCurrentResponse] = useState<USSDResponse | null>(null);
+  const [menuHistory, setMenuHistory] = useState<USSDResponse[]>([]);
   const { toast } = useToast();
+
+  // Auto-execute USSD when code ends with #
+  useEffect(() => {
+    if (ussdCode.endsWith('#') && selectedDevice && selectedSim && !isExecuting && !currentResponse) {
+      executeUSSD();
+    }
+  }, [ussdCode, selectedDevice, selectedSim]);
 
   // Mock devices
   const devices: Device[] = [
@@ -140,20 +147,16 @@ export const USSDExecutor = () => {
 
   const executeUSSD = async () => {
     if (!ussdCode || !selectedDevice || !selectedSim) {
-      toast({
-        title: "Missing Information",
-        description: "Please select device, SIM card and enter USSD code",
-        variant: "destructive"
-      });
       return;
     }
 
     setIsExecuting(true);
     setCurrentResponse(null);
+    setMenuHistory([]);
 
     try {
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Simulate network delay - operator response time
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
       const device = devices.find(d => d.id === selectedDevice);
       const simCard = device?.simCards.find(s => s.slot === selectedSim);
@@ -161,15 +164,16 @@ export const USSDExecutor = () => {
       
       const response = getMockUSSDResponse(ussdCode, operator);
       setCurrentResponse(response);
+      setMenuHistory([response]);
       
       toast({
-        title: "USSD Executed",
-        description: `Code ${ussdCode} executed on ${device?.name} - ${selectedSim}`,
+        title: `${operator} Response`,
+        description: `Connected to ${operator} network`,
       });
     } catch (error) {
       toast({
-        title: "Execution Failed",
-        description: "Failed to execute USSD code",
+        title: "Connection Failed",
+        description: "Failed to connect to operator network",
         variant: "destructive"
       });
     } finally {
@@ -182,67 +186,135 @@ export const USSDExecutor = () => {
 
     setIsExecuting(true);
     
-    // Simulate menu navigation
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    // Simulate operator response time
+    await new Promise(resolve => setTimeout(resolve, 1200));
     
-    // Mock submenu responses
     const device = devices.find(d => d.id === selectedDevice);
     const simCard = device?.simCards.find(s => s.slot === selectedSim);
     const operator = simCard?.operator || "Unknown";
     
     let newResponse: USSDResponse;
     
+    // Handle back navigation
+    if (option === "9" && menuHistory.length > 1) {
+      const previousMenu = menuHistory[menuHistory.length - 2];
+      setCurrentResponse(previousMenu);
+      setMenuHistory(menuHistory.slice(0, -1));
+      setIsExecuting(false);
+      return;
+    }
+    
+    // Handle exit
     if (option === "0") {
       setCurrentResponse(null);
+      setMenuHistory([]);
       setIsExecuting(false);
+      setUssdCode("");
       toast({
         title: "Session Ended",
-        description: "USSD session terminated"
+        description: `${operator} session closed`
       });
       return;
     }
 
-    // Generate submenu based on selection
-    if (option === "1" && ussdCode === "*123#") {
-      newResponse = {
-        sessionId: currentResponse.sessionId,
-        message: `${operator} Airtime Purchase\n\n1. R5\n2. R10\n3. R20\n4. R50\n5. R100\n9. Back\n0. Exit`,
-        isMenu: true,
-        options: [
-          { key: "1", text: "R5" },
-          { key: "2", text: "R10" },
-          { key: "3", text: "R20" },
-          { key: "4", text: "R50" },
-          { key: "5", text: "R100" },
-          { key: "9", text: "Back" },
-          { key: "0", text: "Exit" }
-        ],
-        canGoBack: true
-      };
-    } else if (option === "1" && ussdCode === "*131#") {
-      newResponse = {
-        sessionId: currentResponse.sessionId,
-        message: `${operator} Data Bundles\n\n1. Daily bundles\n2. Weekly bundles\n3. Monthly bundles\n4. Social bundles\n9. Back\n0. Exit`,
-        isMenu: true,
-        options: [
-          { key: "1", text: "Daily bundles" },
-          { key: "2", text: "Weekly bundles" },
-          { key: "3", text: "Monthly bundles" },
-          { key: "4", text: "Social bundles" },
-          { key: "9", text: "Back" },
-          { key: "0", text: "Exit" }
-        ],
-        canGoBack: true
-      };
-    } else {
-      newResponse = {
-        sessionId: currentResponse.sessionId,
-        message: `Option ${option} selected.\n\nFeature coming soon!\n\nThank you for using ${operator} services.`,
-        isMenu: false
-      };
+    // Multi-level menu navigation
+    const currentLevel = menuHistory.length;
+    
+    // Level 1 menus
+    if (currentLevel === 1) {
+      if (ussdCode === "*123#") {
+        if (option === "1") {
+          newResponse = {
+            sessionId: currentResponse.sessionId,
+            message: `${operator} New Line Activation\n\n1. Prepaid activation\n2. Postpaid activation\n3. Corporate activation\n9. Back\n0. Exit`,
+            isMenu: true,
+            options: [
+              { key: "1", text: "Prepaid activation" },
+              { key: "2", text: "Postpaid activation" },
+              { key: "3", text: "Corporate activation" },
+              { key: "9", text: "Back" },
+              { key: "0", text: "Exit" }
+            ],
+            canGoBack: true
+          };
+        } else if (option === "2") {
+          newResponse = {
+            sessionId: currentResponse.sessionId,
+            message: `${operator} SIM Activation\n\nEnter your 19-digit SIM number to activate.\n\nActivation will be completed within 2 hours.\n\nThank you for choosing ${operator}.`,
+            isMenu: false
+          };
+        } else {
+          newResponse = {
+            sessionId: currentResponse.sessionId,
+            message: `${operator}\n\nOption ${option} selected.\n\nProcessing request...\n\nYou will receive confirmation via SMS.`,
+            isMenu: false
+          };
+        }
+      } else if (ussdCode === "*131#") {
+        if (option === "1") {
+          newResponse = {
+            sessionId: currentResponse.sessionId,
+            message: `${operator} 1GB Data Package\n\nPrice: 10 MAD\nValidity: 24 hours\n\n1. Confirm purchase\n9. Back\n0. Exit`,
+            isMenu: true,
+            options: [
+              { key: "1", text: "Confirm purchase" },
+              { key: "9", text: "Back" },
+              { key: "0", text: "Exit" }
+            ],
+            canGoBack: true
+          };
+        } else if (option === "2") {
+          newResponse = {
+            sessionId: currentResponse.sessionId,
+            message: `${operator} 5GB Data Package\n\nPrice: 40 MAD\nValidity: 7 days\n\n1. Confirm purchase\n9. Back\n0. Exit`,
+            isMenu: true,
+            options: [
+              { key: "1", text: "Confirm purchase" },
+              { key: "9", text: "Back" },
+              { key: "0", text: "Exit" }
+            ],
+            canGoBack: true
+          };
+        } else {
+          newResponse = {
+            sessionId: currentResponse.sessionId,
+            message: `${operator} Data Package\n\n1. Confirm purchase\n9. Back\n0. Exit`,
+            isMenu: true,
+            options: [
+              { key: "1", text: "Confirm purchase" },
+              { key: "9", text: "Back" },
+              { key: "0", text: "Exit" }
+            ],
+            canGoBack: true
+          };
+        }
+      } else {
+        newResponse = {
+          sessionId: currentResponse.sessionId,
+          message: `${operator}\n\nOption ${option} processed.\n\nThank you for using ${operator} services.`,
+          isMenu: false
+        };
+      }
+    } 
+    // Level 2+ menus (confirmations, etc)
+    else {
+      if (option === "1") {
+        newResponse = {
+          sessionId: currentResponse.sessionId,
+          message: `${operator}\n\nTransaction successful!\n\nYou will receive a confirmation SMS shortly.\n\nThank you!`,
+          isMenu: false
+        };
+      } else {
+        newResponse = {
+          sessionId: currentResponse.sessionId,
+          message: `${operator}\n\nRequest processed.\n\nThank you for using ${operator}.`,
+          isMenu: false
+        };
+      }
     }
     
     setCurrentResponse(newResponse);
+    setMenuHistory([...menuHistory, newResponse]);
     setIsExecuting(false);
   };
 
@@ -253,8 +325,8 @@ export const USSDExecutor = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Phone className="h-5 w-5" />
-            Execute USSD Code
+            <Smartphone className="h-5 w-5" />
+            USSD Dialer
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -303,27 +375,25 @@ export const USSDExecutor = () => {
           {/* USSD Code Input */}
           <div className="space-y-2">
             <label className="text-sm font-medium">USSD Code</label>
-            <Input
-              placeholder="e.g., *123#"
-              value={ussdCode}
-              onChange={(e) => setUssdCode(e.target.value)}
-              className="font-mono"
-            />
+            <div className="relative">
+              <Input
+                placeholder="Type code and press # to dial..."
+                value={ussdCode}
+                onChange={(e) => setUssdCode(e.target.value)}
+                disabled={isExecuting || !selectedDevice || !selectedSim}
+                className="font-mono text-lg pr-10"
+                autoComplete="off"
+              />
+              {isExecuting && (
+                <Loader2 className="h-4 w-4 animate-spin absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {!selectedDevice || !selectedSim 
+                ? "Select device and SIM card first" 
+                : "Auto-dials when you type # at the end"}
+            </p>
           </div>
-
-          {/* Execute Button */}
-          <Button 
-            onClick={executeUSSD} 
-            disabled={isExecuting || !ussdCode || !selectedDevice || !selectedSim}
-            className="w-full"
-          >
-            {isExecuting ? (
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
-            ) : (
-              <Phone className="h-4 w-4 mr-2" />
-            )}
-            {isExecuting ? "Executing..." : "Execute USSD"}
-          </Button>
         </CardContent>
       </Card>
 
