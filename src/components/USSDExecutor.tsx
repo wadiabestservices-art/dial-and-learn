@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Smartphone, CreditCard, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { USSDMenu } from "./USSDMenu";
+import { Capacitor } from '@capacitor/core';
 
 interface Device {
   id: string;
@@ -155,19 +156,20 @@ export const USSDExecutor = () => {
     setMenuHistory([]);
 
     try {
-      // Simulate network delay - operator response time
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
       const device = devices.find(d => d.id === selectedDevice);
       const simCard = device?.simCards.find(s => s.slot === selectedSim);
       const operator = simCard?.operator || "Unknown";
+      
+      // Simulate network delay - operator response time
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
       const response = getMockUSSDResponse(ussdCode, operator);
       setCurrentResponse(response);
       setMenuHistory([response]);
       
+      const isNative = Capacitor.isNativePlatform();
       toast({
-        title: `${operator} Response`,
+        title: `${operator} Response${!isNative ? ' (Simulated)' : ''}`,
         description: `Connected to ${operator} network`,
       });
     } catch (error) {
